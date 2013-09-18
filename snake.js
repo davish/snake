@@ -1,4 +1,6 @@
 window.SQUARE_SIZE = 25;
+var SPEED = 75; // milliseconds delay between steps
+
 var add_x = 0, add_y = 0;
 var head = {x: 5, y: 5};
 var boundaries = [];
@@ -19,15 +21,19 @@ function reset() {
 
   clearField();
   makeFruit();
-  window.loop = setInterval(step, 100);
+  window.loop = setInterval(step, SPEED);
 
 }
 
-function initialize(){
-  // initialize the canvas and grid
-  window.canvas = document.getElementById('tutorial');
-  canvas.width = window.innerWidth - window.innerWidth % SQUARE_SIZE;
-  canvas.height = window.innerHeight - window.innerHeight % SQUARE_SIZE;
+function initializeSnake(w, h){
+  // initialize the canvas and grid, with the width and height as parameters
+  window.canvas = document.getElementById('snakeBoard');
+  // canvas.width = window.innerWidth - window.innerWidth % SQUARE_SIZE;
+  // canvas.height = window.innerHeight - window.innerHeight % SQUARE_SIZE;
+  // canvas.width = canvas.width - (canvas.width % SQUARE_SIZE);
+  // canvas.height = canvas.height - (canvas.height % SQUARE_SIZE);
+  canvas.width = w;
+  canvas.height = h;
   window.grid_width = canvas.width / SQUARE_SIZE; 
   window.grid_height = canvas.height / SQUARE_SIZE;
   if (canvas.getContext){
@@ -35,7 +41,7 @@ function initialize(){
     // drawGrid(SQUARE_SIZE);
     makeBorder();
     makeFruit();
-    window.loop = setInterval(step, 100);
+    window.loop = setInterval(step, SPEED);
   }
 }
 
@@ -68,16 +74,17 @@ function makeFruit() {
   var rand_x = Math.round(Math.random() * grid_width - 1);
   var rand_y = Math.round(Math.random() * grid_height - 1);
 
-  for (var i = 0; i < forbidden.length; i++) {
-    if (forbidden[i].x == rand_x && forbidden[i].y == rand_y) {
-      rand_x = Math.round(Math.random() * grid_width - 1);
-      rand_y = Math.round(Math.random() * grid_height - 1);
-    }
-  };
+  while (rand_x <= 0 || rand_x >= grid_width - 1) {
+    rand_x = Math.round(Math.random() * grid_width - 1);
+  }
+  while (rand_y <= 0 || rand_y >= grid_height - 1) {
+    rand_y = Math.round(Math.random() * grid_height - 1);
+  }
 
   fruit.x = rand_x;
   fruit.y = rand_y;
 
+  console.log(rand_x + "," + rand_y);
 
 }
 function gameOver() {
