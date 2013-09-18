@@ -28,17 +28,16 @@ function reset() {
 function initializeSnake(w, h){
   // initialize the canvas and grid, with the width and height as parameters
   window.canvas = document.getElementById('snakeBoard');
-  // canvas.width = window.innerWidth - window.innerWidth % SQUARE_SIZE;
-  // canvas.height = window.innerHeight - window.innerHeight % SQUARE_SIZE;
-  // canvas.width = canvas.width - (canvas.width % SQUARE_SIZE);
-  // canvas.height = canvas.height - (canvas.height % SQUARE_SIZE);
+
   canvas.width = w;
   canvas.height = h;
-  window.grid_width = canvas.width / SQUARE_SIZE; 
-  window.grid_height = canvas.height / SQUARE_SIZE;
+
+  window.grid_width = Math.floor(canvas.width / SQUARE_SIZE); 
+  window.grid_height = Math.floor(canvas.height / SQUARE_SIZE);
+  
   if (canvas.getContext){
     window.ctx = canvas.getContext('2d');
-    // drawGrid(SQUARE_SIZE);
+    // drawGrid(SQUARE_SIZE); // For dev purposes
     makeBorder();
     makeFruit();
     window.loop = setInterval(step, SPEED);
@@ -58,7 +57,7 @@ function step() {
       gameOver();
     }
     if (fruit.x == head.x && fruit.y == head.y) {
-      snakeLength++;
+      console.log(++snakeLength);
       makeFruit();
     }
   }
@@ -69,8 +68,6 @@ function step() {
 function makeFruit() {
   // generate random coordinates and put a fruit on the grid
   // grid_height grid_width
-        console.log(snakeLength);
-
   var rand_x = Math.round(Math.random() * grid_width - 1);
   var rand_y = Math.round(Math.random() * grid_height - 1);
 
