@@ -25,16 +25,16 @@ function reset() {
 
 }
 
-function initializeSnake(w, h){
+function initializeSnake(id){
   // initialize the canvas and grid, with the width and height as parameters
-  window.canvas = document.getElementById('snakeBoard');
+  window.canvas = document.getElementById(id);
 
-  canvas.width = w;
-  canvas.height = h;
+  // canvas.width = w;
+  // canvas.height = h;
 
   window.grid_width = Math.floor(canvas.width / SQUARE_SIZE); 
   window.grid_height = Math.floor(canvas.height / SQUARE_SIZE);
-  
+
   if (canvas.getContext){
     window.ctx = canvas.getContext('2d');
     // drawGrid(SQUARE_SIZE); // For dev purposes
@@ -45,15 +45,15 @@ function initializeSnake(w, h){
 }
 
 function step() {
-  // function called by setInterval()
+  // function called by setInterval() to move one step forward in game
   head.x += add_x;
   head.y += add_y;
+
   var body = snakeLength > 0 ? history.slice(-snakeLength) : [];
   window.forbidden = boundaries.concat(body);
 
   for (var i = 0; i < forbidden.length; i++) {
     if (forbidden[i].x == head.x && forbidden[i].y == head.y) {
-
       gameOver();
     }
     if (fruit.x == head.x && fruit.y == head.y) {
@@ -124,6 +124,7 @@ function fillSquare(x, y, fill, color) {
 
 window.onkeydown = function(event) {
   // clockwise starting from left arrow 37-40
+  // event handler
   if (event.which == 37 && add_x != 1) {
     // left
     add_x = -1;
@@ -152,7 +153,7 @@ window.onkeydown = function(event) {
 }
 
 function drawGrid(interval) {
-  // draw a grid with the interval between lines in px
+  // draw a grid with the interval between lines in px for dev purposes
   ctx.beginPath();
   for (var x = interval; x < canvas.width; x=x+interval) {
     ctx.moveTo(x, 0);
@@ -167,7 +168,7 @@ function drawGrid(interval) {
 }
 
 function makeBorder() {
-  // fill in the border blocks
+  // fill in the border blocks as black
   for (var i = 0; i < grid_width; i++) {
     fillSquare(i, 0, true);
     boundaries.push({x: i, y: 0});
