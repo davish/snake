@@ -1,36 +1,13 @@
-window.SQUARE_SIZE = 25;
-var SPEED = 75; // milliseconds delay between steps
+window.SQUARE_SIZE = 10;
+var SPEED = 100; // milliseconds delay between steps 
 
-var add_x = 0, add_y = 0;
-var head = {x: 5, y: 5};
-var boundaries = [];
-var history = []; // places the snake's head has been
-var snakeLength = 0;
-var forbidden = [];
-var fruit = {};
- 
+boundaries = [];
 
-function reset() {
-  // reset the board and snake variables
-  add_x = 0;
-  add_y = 0;
-  head = {x: 5, y: 5};
-  history = [];
-  snakeLength = 0;
-  fruit = {};
 
-  clearField();
-  makeFruit();
-  window.loop = setInterval(step, SPEED);
-
-}
 
 function initializeSnake(id){
   // initialize the canvas and grid, with the width and height as parameters
   window.canvas = document.getElementById(id);
-
-  // canvas.width = w;
-  // canvas.height = h;
 
   window.grid_width = Math.floor(canvas.width / SQUARE_SIZE); 
   window.grid_height = Math.floor(canvas.height / SQUARE_SIZE);
@@ -39,26 +16,46 @@ function initializeSnake(id){
     window.ctx = canvas.getContext('2d');
     // drawGrid(SQUARE_SIZE); // For dev purposes
     makeBorder();
-    makeFruit();
-    window.loop = setInterval(step, SPEED);
+    reset();
   }
+}
+
+function reset() {
+  // reset the board and snake variables
+  window.add_x = 0;
+  window.add_y = 0;
+  window.head = {x: 5, y: 5};
+  window.snakeHistory = [];
+  window.snakeLength = 0;
+  window.fruit = {};
+
+  document.getElementById("score").innerHTML = snakeLength;
+
+  clearField();
+  makeFruit();
+  makeBorder();
+  window.loop = setInterval(step, SPEED);
+
 }
 
 function step() {
   // function called by setInterval() to move one step forward in game
+  window.pressed = false;
   head.x += add_x;
   head.y += add_y;
 
-  var body = snakeLength > 0 ? history.slice(-snakeLength) : [];
+  var body = snakeLength > 0 ? snakeHistory.slice(-snakeLength) : [];
   window.forbidden = boundaries.concat(body);
 
-  for (var i = 0; i < forbidden.length; i++) {
-    if (forbidden[i].x == head.x && forbidden[i].y == head.y) {
+  if (fruit.x == head.x && fruit.y == head.y) { // if you ate the fruit
+    document.getElementById("score").innerHTML = ++snakeLength;
+    makeFruit(); // make a new one
+  }
+  
+  for (var i = 0; i < forbidden.length; i++) { // check the head position against the array of stuff you can't hit in to
+    if (forbidden[i].x == head.x && forbidden[i].y == head.y) { // if you ran into a wall or yourself
       gameOver();
-    }
-    if (fruit.x == head.x && fruit.y == head.y) {
-      console.log(++snakeLength);
-      makeFruit();
+      return;
     }
   }
   updateSnake(body);
@@ -68,10 +65,13 @@ function step() {
 function makeFruit() {
   // generate random coordinates and put a fruit on the grid
   // grid_height grid_width
-  var rand_x = Math.round(Math.random() * grid_width - 1);
-  var rand_y = Math.round(Math.random() * grid_height - 1);
+  // always going to be within the grid, not on the boundary
+  var rand_x = Math.floor(Math.random() * (grid_width - 3)+1); // 50-3=47; 0 to 47+1 is 1 to 48
+  var rand_y = Math.floor(Math.random() * (grid_height - 3)+1);
 
-  while (rand_x <= 0 || rand_x >= grid_width - 1) {
+
+
+  while ((rand_x <= 0 || rand_x >= grid_width - 1)) {
     rand_x = Math.round(Math.random() * grid_width - 1);
   }
   while (rand_y <= 0 || rand_y >= grid_height - 1) {
@@ -86,9 +86,8 @@ function makeFruit() {
 }
 function gameOver() {
   clearInterval(loop);
-  var r = confirm("Nice Try! you got " + snakeLength + " fruits!\n\nHit OK to reset the game.");
-  if (r) 
-    reset();
+  document.getElementById("score").innerHTML = "Game Over!";
+  makeBorder();
 }
 
 function updateSnake(body) {
@@ -97,7 +96,7 @@ function updateSnake(body) {
     fillSquare(body[i].x, body[i].y, true, "rgb(0, 100, 500)");
   };
   fillSquare(head.x, head.y, true, "rgb(0, 100, 500)");
-  history.push({x: head.x, y: head.y});
+  snakeHistory.push({x: head.x, y: head.y});
 
 }
 
@@ -125,30 +124,34 @@ function fillSquare(x, y, fill, color) {
 window.onkeydown = function(event) {
   // clockwise starting from left arrow 37-40
   // event handler
-  if (event.which == 37 && add_x != 1) {
+  if (event.which == 37 && (snakeLength == 0|| add_x != 1) && !pressed) {
     // left
     add_x = -1;
     add_y = 0;
     event.preventDefault();
-    event.returnValue = false;  
-  } else if (event.which == 38 && add_y != 1) {
+    event.returnValue = false;
+    window.pressed = true;
+  } else if (event.which == 38 && (snakeLength == 0|| add_y != 1) && !pressed) {
     // up
     add_x = 0;
     add_y = -1;
     event.preventDefault();
-    event.returnValue = false;  
-  } else if (event.which == 39 && add_x != -1) {
+    event.returnValue = false;
+    window.pressed = true;  
+  } else if (event.which == 39 && (snakeLength == 0|| add_x != -1) && !pressed) {
     // right
     add_x = 1;
     add_y = 0;
     event.preventDefault();
-    event.returnValue = false;  
-  } else if (event.which == 40 && add_y != -1) {
+    event.returnValue = false;
+    window.pressed = true; 
+  } else if (event.which == 40 && (snakeLength == 0|| add_y != -1) && !pressed) {
     // down
     add_x = 0;
     add_y = 1;
     event.preventDefault();
-    event.returnValue = false;  
+    event.returnValue = false;
+    window.pressed = true;
   }
 }
 
