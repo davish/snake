@@ -5,10 +5,11 @@
       canvas { border: 1px solid black;}
     </style>
   </head>
-  <body onload="initializeSnake('snakeBoard');">
+  <body onload="loaded()">
     <canvas id="snakeBoard" width="500px" height="500px"></canvas>
+    <script type="text/javascript" src="init.js"></script>
     <script type="text/javascript" src="snake.js"></script>
     <div id="score">hello</div>
-    <button onclick="reset()">reset</button>
+    <button onclick="board.reset()">reset</button>
   </body>
 </html>
